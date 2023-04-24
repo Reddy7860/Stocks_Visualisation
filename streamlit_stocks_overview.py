@@ -18,9 +18,11 @@ page_layout = {
 
 st.set_page_config(**page_layout)
 
+st.cache_data()
 def unix_time_to_datetime(unix_time):
     return datetime.datetime.fromtimestamp(unix_time)
 
+st.cache_data()
 # Create function to fetch company info
 def get_company_info(ticker):
     # Fetch ticker data from Yahoo Finance API
@@ -76,6 +78,7 @@ def get_company_info(ticker):
     
     return df, summary_text
 
+st.cache_data()
 # Create function to fetch stock price data for the last 5 years
 def get_stock_price_data(ticker):
     # Fetch ticker data from Yahoo Finance API
@@ -94,6 +97,7 @@ def get_stock_price_data(ticker):
     
     return hist
 
+st.cache_data()
 # Define functions to render each tab
 def render_overview():
     # Fetch company info
@@ -106,6 +110,7 @@ def render_overview():
     st.write(summary_text)
     st.table(info_df)
 
+st.cache_data()
 def render_price_chart():
     # Get the stock price data
     hist = get_stock_price_data(ticker)
@@ -162,7 +167,7 @@ def render_price_chart():
     st.write("- Moving averages are commonly used to smooth out the price data and identify trends.")
     st.write("- The 7-day and 14-day moving averages are commonly used by traders to identify short-term and long-term trends.")
 
-
+st.cache_data()
 def render_news():
     # Fetch news articles for the company
     ticker = "AAPL"  # replace with your desired ticker symbol
@@ -176,6 +181,7 @@ def render_news():
 
     st.table(news_df)
 
+st.cache_data()
 def render_forecasting():
     
     days_to_forecast = sidebar.slider('Select the number of days to forecast', 1, 30, 14)
