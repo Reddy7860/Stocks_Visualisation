@@ -170,7 +170,7 @@ def render_price_chart():
 st.cache_data()
 def render_news():
     # Fetch news articles for the company
-    ticker = "AAPL"  # replace with your desired ticker symbol
+#     ticker = "AAPL"  # replace with your desired ticker symbol
     company = yf.Ticker(ticker)
     news_df = company.news
 
