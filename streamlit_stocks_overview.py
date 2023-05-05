@@ -188,10 +188,10 @@ def render_forecasting():
     days_to_forecast = sidebar.slider('Select the number of days to forecast', 1, 30, 14)
     hist = get_stock_price_data(ticker)
 
-    # Allow user to choose ARIMA or GARCH model
-    model_choice = st.radio("Select a model for forecasting:", ("ARIMA", "GARCH"))
+    # Allow user to choose ARIMA or Exponential Smoothing model
+    model_choice = st.radio("Select a model for forecasting:", ("ARIMA", "Exponential Smoothing"))
 
-    # Prepare data for ARIMA or GARCH
+    # Prepare data for ARIMA or Exponential Smoothing
     if model_choice == "ARIMA":
         df = hist[['Close']].reset_index().rename(columns={'Date': 'ds', 'Close': 'y'})
         model = auto_arima(df['y'], trace=False, error_action='ignore', suppress_warnings=True)
@@ -201,25 +201,31 @@ def render_forecasting():
         model_name = "ARIMA"
         model_description = "ARIMA (Autoregressive Integrated Moving Average) is a popular time series forecasting model that uses past values to predict future values."
     else:
-        df = hist['Close'].pct_change().dropna()
-        model = arch_model(df, vol='GARCH', p=1, q=1)
-        results = model.fit(disp='off')
-        forecast = results.forecast(horizon=days_to_forecast).mean.values
-        conf_int = results.forecast(horizon=days_to_forecast).variance.values[-1, :]
-        conf_int_80 = pd.DataFrame({'Lower 80% Confidence Interval': np.sqrt(conf_int)*-1.28, 'Upper 80% Confidence Interval': np.sqrt(conf_int)*1.28})
-        conf_int_95 = pd.DataFrame({'Lower 95% Confidence Interval': np.sqrt(conf_int)*-1.96, 'Upper 95% Confidence Interval': np.sqrt(conf_int)*1.96})
-        forecast = hist['Close'].iloc[-1] * np.exp(forecast.cumsum())
-        model_name = "GARCH"
-        model_description = "GARCH (Generalized Autoregressive Conditional Heteroskedasticity) is a popular time series forecasting model that uses past variance to predict future variance and uses that to predict future prices."
+        model = ExponentialSmoothing(hist['Close'], seasonal_periods=14, trend='add', seasonal='add').fit()
+        forecast = model.forecast(days_to_forecast)
+        errors = hist['Close'] - model.fittedvalues
+        error_std = np.std(errors)
+        conf_int_80 = pd.DataFrame({'Lower 80% Confidence Interval': forecast - 1.28 * error_std, 'Upper 80% Confidence Interval': forecast + 1.28 * error_std})
+        conf_int_95 = pd.DataFrame({'Lower 95% Confidence Interval': forecast - 1.96 * error_std, 'Upper 95% Confidence Interval': forecast + 1.96 * error_std})
+        model_name = "Exponential Smoothing"
+        model_description = "Exponential Smoothing is a popular time series forecasting model that assigns exponentially decreasing weights to past observations and uses them to predict future values."
+
+    # Set plot color scheme based on model choice
+    if model_choice == "ARIMA":
+        actual_color = 'blue'
+        forecast_color = 'green'
+    else:
+        actual_color = 'blue'
+        forecast_color = 'orange'
 
     # Create plot
     fig = go.Figure()
 
     # Add actual closing prices to plot
-    fig.add_trace(go.Scatter(x=hist.index, y=hist['Close'], name='Actual', line=dict(color='blue')))
+    fig.add_trace(go.Scatter(x=hist.index, y=hist['Close'], name='Actual', line=dict(color=actual_color)))
 
     # Add predicted values to plot
-    fig.add_trace(go.Scatter(x=pd.date_range(start=hist.index[-1], periods=days_to_forecast+1, freq='D')[1:], y=forecast, name=f'{model_name} Predicted', line=dict(color='green')))
+    fig.add_trace(go.Scatter(x=pd.date_range(start=hist.index[-1], periods=days_to_forecast+1, freq='D')[1:], y=forecast, name=f'{model_name} Predicted', line=dict(color=forecast_color)))
 
     # Add 80% confidence interval bands to plot
     fig.add_trace(go.Scatter(x=pd.date_range(start=hist.index[-1], periods=days_to_forecast+1, freq='D')[1:], y=conf_int_80['Lower 80% Confidence Interval'], name='Lower 80% Confidence Interval', line=dict(color='red', dash='dot')))
