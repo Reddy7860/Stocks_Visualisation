@@ -3,6 +3,7 @@ import yfinance as yf
 import plotly.graph_objs as go
 import pandas as pd
 from pmdarima.arima import auto_arima
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from arch import arch_model
 import numpy as np
 import datetime
@@ -194,15 +195,20 @@ def render_forecasting():
     if model_choice == "ARIMA":
         df = hist[['Close']].reset_index().rename(columns={'Date': 'ds', 'Close': 'y'})
         model = auto_arima(df['y'], trace=False, error_action='ignore', suppress_warnings=True)
-        forecast = model.predict(n_periods=days_to_forecast)
+        forecast, conf_int = model.predict(n_periods=days_to_forecast, return_conf_int=True)
+        conf_int_80 = pd.DataFrame({'Lower 80% Confidence Interval': conf_int[:, 0], 'Upper 80% Confidence Interval': conf_int[:, 1]})
+        conf_int_95 = pd.DataFrame(columns=['Lower 95% Confidence Interval', 'Upper 95% Confidence Interval'])
         model_name = "ARIMA"
         model_description = "ARIMA (Autoregressive Integrated Moving Average) is a popular time series forecasting model that uses past values to predict future values."
     else:
         df = hist['Close'].pct_change().dropna()
         model = arch_model(df, vol='GARCH', p=1, q=1)
         results = model.fit(disp='off')
-        forecast = results.forecast(horizon=days_to_forecast).variance.values[-1, :]
-        forecast = hist['Close'].iloc[-1] * np.exp(np.sqrt(forecast))
+        forecast = results.forecast(horizon=days_to_forecast).mean.values
+        conf_int = results.forecast(horizon=days_to_forecast).variance.values[-1, :]
+        conf_int_80 = pd.DataFrame({'Lower 80% Confidence Interval': np.sqrt(conf_int)*-1.28, 'Upper 80% Confidence Interval': np.sqrt(conf_int)*1.28})
+        conf_int_95 = pd.DataFrame({'Lower 95% Confidence Interval': np.sqrt(conf_int)*-1.96, 'Upper 95% Confidence Interval': np.sqrt(conf_int)*1.96})
+        forecast = hist['Close'].iloc[-1] * np.exp(forecast.cumsum())
         model_name = "GARCH"
         model_description = "GARCH (Generalized Autoregressive Conditional Heteroskedasticity) is a popular time series forecasting model that uses past variance to predict future variance and uses that to predict future prices."
 
@@ -210,10 +216,14 @@ def render_forecasting():
     fig = go.Figure()
 
     # Add actual closing prices to plot
-    fig.add_trace(go.Scatter(x=hist.index, y=hist['Close'], name='Actual'))
+    fig.add_trace(go.Scatter(x=hist.index, y=hist['Close'], name='Actual', line=dict(color='blue')))
 
     # Add predicted values to plot
-    fig.add_trace(go.Scatter(x=pd.date_range(start=hist.index[-1], periods=days_to_forecast+1, freq='D')[1:], y=forecast, name=f'{model_name} Predicted'))
+    fig.add_trace(go.Scatter(x=pd.date_range(start=hist.index[-1], periods=days_to_forecast+1, freq='D')[1:], y=forecast, name=f'{model_name} Predicted', line=dict(color='green')))
+
+    # Add 80% confidence interval bands to plot
+    fig.add_trace(go.Scatter(x=pd.date_range(start=hist.index[-1], periods=days_to_forecast+1, freq='D')[1:], y=conf_int_80['Lower 80% Confidence Interval'], name='Lower 80% Confidence Interval', line=dict(color='red', dash='dot')))
+    fig.add_trace(go.Scatter(x=pd.date_range(start=hist.index[-1], periods=days_to_forecast+1, freq='D')[1:], y=conf_int_80['Upper 80% Confidence Interval'], name='Upper 80% Confidence Interval', line=dict(color='red', dash='dot')))
 
     # Set plot layout
     fig.update_layout(
