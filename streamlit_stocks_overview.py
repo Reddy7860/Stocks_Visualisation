@@ -200,6 +200,8 @@ def render_forecasting():
         conf_int_95 = pd.DataFrame(columns=['Lower 95% Confidence Interval', 'Upper 95% Confidence Interval'])
         model_name = "ARIMA"
         model_description = "ARIMA (Autoregressive Integrated Moving Average) is a popular time series forecasting model that uses past values to predict future values."
+        model_summary = model.summary()
+
     else:
         model = ExponentialSmoothing(hist['Close'], seasonal_periods=14, trend='add', seasonal='add').fit()
         forecast = model.forecast(days_to_forecast)
@@ -209,6 +211,8 @@ def render_forecasting():
         conf_int_95 = pd.DataFrame({'Lower 95% Confidence Interval': forecast - 1.96 * error_std, 'Upper 95% Confidence Interval': forecast + 1.96 * error_std})
         model_name = "Exponential Smoothing"
         model_description = "Exponential Smoothing is a popular time series forecasting model that assigns exponentially decreasing weights to past observations and uses them to predict future values."
+        model_summary = model.summary()
+
 
     # Set plot color scheme based on model choice
     if model_choice == "ARIMA":
@@ -258,9 +262,16 @@ def render_forecasting():
 
     # Set the index of the DataFrame to be the Date column
     forecast_df.set_index('Date', inplace=True)
+    
+    # Show Model Summary and Display the DataFrame side by side
+    col1, col2 = st.beta_columns(2)
 
-    # Display the DataFrame
-    st.write(forecast_df)
+    with col1:
+        st.text(model_summary)
+
+    with col2:
+        st.write(forecast_df)
+    
 
 # Define page layout
 tabs = ['Overview', 'Price Chart', 'News','Forecasting']
