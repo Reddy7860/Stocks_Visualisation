@@ -5,3 +5,4 @@ pandas==1.4.2
 pmdarima==2.0.1
 arch==5.4.0
 numpy==1.23.5
+statsmodels
