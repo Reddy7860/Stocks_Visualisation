@@ -1,6 +1,8 @@
 Stock Analysis App
 This is a Streamlit app that provides a variety of tools for analyzing stock data. Users can select a stock, view company information, a candlestick chart of stock prices, recent news articles related to the company, and forecasted stock prices using either an ARIMA or GARCH model.
 
+https://reddy7860-stocks-visualisation-streamlit-stocks-overview-y4h7ts.streamlit.app/
+
 Demo
 Check out the published app to see the app in action.
 
