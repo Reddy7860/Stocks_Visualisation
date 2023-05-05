@@ -247,12 +247,12 @@ def render_forecasting():
             color="Black"
         )
     )
+    
+    # Display the forecast model description
+    st.write(f"**{model_name} model:** {model_description}")
 
     # Show plot
     st.plotly_chart(fig)
-
-    # Display the forecast model description
-    st.write(f"**{model_name} model:** {model_description}")
 
     # Create a list of dates for the forecasted period
     forecast_dates = pd.date_range(start=hist.index[-1], periods=days_to_forecast+1, freq='D')[1:]
