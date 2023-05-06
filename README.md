@@ -6,6 +6,10 @@ https://reddy7860-stocks-visualisation-streamlit-stocks-overview-hbcmo2.streamli
 Demo
 Check out the published app to see the app in action.
 
+### Demo Video
+
+[![Demo Video](https://www.youtube.com/watch?v=1MLuzetP8pM)]
+
 Dependencies
 This app requires the following Python libraries:
 
