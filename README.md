@@ -29,25 +29,17 @@ To install this project, follow these steps:
 
 1. Clone the repository to your local machine
 2. Install any necessary dependencies using the 'pip install requirements.txt'
-3. Run the project using streamlit run 
+3. Run the project using streamlit run streamlit_stocks_overview.py
 
-bash
-Copy code
-pip install streamlit yfinance plotly pandas pmdarima arch
-Usage
-To run the app, navigate to the root directory of the project and run the following command:
+## Contributing
 
-bash
-Copy code
-streamlit run streamlit_stocks_overview.py
-Once the app is running, select a stock from the dropdown menu and choose the tab corresponding to the tool you want to use. The available tabs are:
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to contribute to this project.
 
-Overview: Displays information about the selected company.
-Price Chart: Displays a candlestick chart of the stock's historical prices.
-News: Displays recent news articles related to the selected company.
-Forecasting: Uses either an ARIMA or GARCH model to forecast the stock's price for the next 1-30 days.
-Contributing
-If you would like to contribute to the project, feel free to submit a pull request on the GitHub repository.
+## Authors and Acknowledgement
 
-License
-This project is licensed under the terms of the MIT license. See the LICENSE file for details.
+- List the names of the project contributors
+- If applicable, acknowledge any resources, libraries, or tools that you used to develop this project
+
+## License
+
+This project is licensed under the [LICENSE NAME HERE](LICENSE.md) license. See the [LICENSE.md](LICENSE.md) file for details.
