@@ -23,6 +23,14 @@ This app requires the following Python libraries:
 Installation
 To install the required Python libraries, run the following command:
 
+## Installation
+
+To install this project, follow these steps:
+
+1. Clone the repository to your local machine
+2. Install any necessary dependencies using the 'pip install requirements.txt'
+3. Run the project using streamlit run 
+
 bash
 Copy code
 pip install streamlit yfinance plotly pandas pmdarima arch
