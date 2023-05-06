@@ -35,7 +35,8 @@ def get_company_info(ticker):
     # print(info)
 
     # Get long business summary
-    long_business_summary = info['longBusinessSummary']
+#     long_business_summary = info['longBusinessSummary']
+    long_business_summary = info.get('longBusinessSummary', 'N/A')
     
     # Create dataframe with relevant company info
     df = pd.DataFrame({
