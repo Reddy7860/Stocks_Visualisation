@@ -10,15 +10,16 @@ Check out the published app to see the app in action.
 
 [![Watch the video](https://img.youtube.com/vi/T-D1KVIuvjA/maxresdefault.jpg)](https://www.youtube.com/watch?v=1MLuzetP8pM)
 
-Dependencies
 This app requires the following Python libraries:
 
-streamlit
-yfinance
-plotly
-pandas
-pmdarima
-arch
+- streamlit
+- yfinance
+- plotly
+- pandas
+- pmdarima
+- arch
+
+
 Installation
 To install the required Python libraries, run the following command:
 
